@@ -1,0 +1,1 @@
+export const MAX_ALLOWED_TRAVEL_RATE = 1000;
