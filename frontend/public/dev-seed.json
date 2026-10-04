@@ -1,0 +1,14 @@
+{
+  "ownerId": "6aadb901fd98e7a68f51f5d7",
+  "firebaseUid": "mustdash-owner-dev",
+  "shopId": "6aadb905d8d25de137674659",
+  "email": "owner@test.com",
+  "shopName": "Must Dash",
+  "addressString": "Bole Road, Addis Ababa, Ethiopia",
+  "latitude": 8.9806,
+  "longitude": 38.7578,
+  "customerId": "6aadb901fd98e7a68f51f5d9",
+  "customerFirebaseUid": "mustdash-customer-dev",
+  "adminId": "6aadb901fd98e7a68f51f5d8",
+  "adminFirebaseUid": "mustdash-admin-dev"
+}
