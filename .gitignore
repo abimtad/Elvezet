@@ -7,8 +7,6 @@ build/
 *.tsbuildinfo
 
 # Environment and secrets
-.env
-.env.*
 !.env.example
 *.pem
 *.key
@@ -35,7 +33,7 @@ tmp/
 # OS / Editor
 .DS_Store
 Thumbs.db
-.vscode/
 .idea/
 
 ./barber-shope-b07c2-firebase-adminsdk-fbsvc-14b890ed7b.json
+config.bat

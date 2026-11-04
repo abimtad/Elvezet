@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Web dashboard and admin console
 
-## Getting Started
+The Elvezet website for **shop owners** (run the shop from a desk) and for
+**platform admins** (run the marketplace). Built with Next.js 16 (App Router),
+React 19, Tailwind CSS 4, NextAuth and TanStack Query. It talks only to the
+backend API in this repo. It is not the customer app; that is a separate
+Flutter app.
 
-First, run the development server:
+![Owner booking calendar](../docs/screenshots/web-dashboard/booking-calendar.jpg)
+
+## Run it
+
+The API must be running first (see [docs/INSTALLATION.md](../docs/INSTALLATION.md)).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd frontend
+npm ci
+cat > .env.local <<'EOF'
+NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=change-me-to-a-long-random-string
+EOF
+npm run dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+With the API in development mode and `npm run seed:mustdash` loaded, open
+`/auth/signin` and click **Login as Test Owner** (or **Login as Test Admin**).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Set `NEXT_PUBLIC_API_URL` explicitly. Without it, the browser falls back to
+localhost, but `next.config.ts` falls back to the **production** API. Every
+variable is listed in [docs/ENVIRONMENT.md](../docs/ENVIRONMENT.md#web-dashboard-frontendenvlocal).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | What it does |
+|---|---|
+| `npm run dev` | Development server on port 3000. |
+| `npm run build` / `npm run start` | Production build and server. |
+| `npm run lint` | ESLint. |
 
-## Learn More
+## What's in it
 
-To learn more about Next.js, take a look at the following resources:
+**Owner dashboard** (sign in at `/auth/signin`):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Page | Purpose |
+|---|---|
+| `/` | Booking grid per staff member for a day. Add walk-ins, end-of-day report. |
+| `/bookings` | Booking list, status changes, receipts, chat with customers. |
+| `/clients` | Client list, visit history, notes. |
+| `/staff`, `/team` | Staff profiles, working hours, time off, commissions, visibility. |
+| `/services`, `/inventory` | Services with prices and durations. Products and stock. |
+| `/analytics` | Revenue and booking statistics. |
+| `/reviews` | Customer reviews. |
+| `/settings` | Business profile, `/settings/branding`, `/settings/payments` (receiving account for receipt checks), `/settings/sms`. |
+| `/application` | New businesses apply to join the platform. |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Admin console** (`/admin`, separate sign-in at `/admin/signin`): overview,
+business applications and onboarding, verification queue, tenants, users,
+categories, Discover videos, business posters, safety reports, SMS.
 
-## Deploy on Vercel
+**Public pages**: `/privacy`, `/account-deletion` (request account deletion
+without signing in), `/reset-password`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## How it works
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Sign-in**: Firebase signs the user in. NextAuth then keeps a session, and
+  every API call sends the Firebase token. The admin console uses its own
+  session cookie, and `src/middleware.ts` blocks `/admin` without it.
+- **Data**: Axios client in `src/lib/axios.ts`, API calls in `src/services/`,
+  live refresh over Socket.IO (`src/lib/realtime.ts`).
+- **Offline**: a service worker plus IndexedDB (`src/lib/offline/`) let
+  owners keep working and queue walk-ins while offline. See
+  [WEBSITE_OFFLINE.md](../WEBSITE_OFFLINE.md).
+- The poster image rules are shared with the backend: `src/lib/business-poster-image.ts`
+  imports `../../../src/utils/business-poster-policy`, and `next.config.ts`
+  sets the Turbopack root to the repo root so that works. Keep `frontend/`
+  inside this repo.
+
+## Layout
+
+```
+src/
+  app/          pages (App Router); admin/ holds the admin console
+  components/   UI components
+  hooks/        React hooks
+  lib/          API client, auth options, realtime, offline storage
+  services/     one file per API area (bookings, dashboard, staff, ...)
+  types/        TypeScript types
+  middleware.ts protects /admin
+public/         static files; dev-seed.json is rewritten by the backend seed
+```

@@ -4,9 +4,9 @@
   "description": "Production-ready backend for a salon booking marketplace",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc -p tsconfig.json",
-    "start": "node dist/server.js",
+    "dev": "node init && tsx watch src/server.ts",
+    "build": "node init && tsc -p tsconfig.json",
+    "start": "node init && node dist/server.js",
     "typecheck": "tsc --noEmit",
     "test:privacy": "tsx src/tests/privacy-safety.integration.ts",
     "test:ratings": "tsx src/tests/trustworthy-ratings.integration.ts",
@@ -57,5 +57,6 @@
     "sharp": "^0.34.5",
     "redis": "^5.11.0",
     "socket.io": "^4.8.3"
-  }
+  },
+  "license": "MIT"
 }
