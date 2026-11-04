@@ -1,6 +1,9 @@
 # Barber Shop Backend API Reference (Code-Derived)
 
-This reference is generated from the current route, validator, model, and service code.
+This reference covers request and response bodies for the main endpoints. It is
+not the full list: **every** endpoint (200+) is listed in
+[`docs/API_ENDPOINTS.md`](docs/API_ENDPOINTS.md). Paths here use the `/api`
+prefix; `/api/v1` works the same way.
 
 ## 1) Base URLs
 
@@ -259,7 +262,7 @@ Auth: Protected (owner)
 
 Auth: Protected (owner)
 
-### GET /api/businesses/:id/services
+### GET /api/businesses/:businessId/services
 
 Auth: Protected (owner)
 
@@ -310,7 +313,7 @@ Success `200` (`data` = active staff[]):
 }
 ````
 
-### GET /api/businesses/:id/reviews
+### GET /api/businesses/:businessId/reviews
 
 Auth: Public
 
@@ -565,29 +568,15 @@ Success `201` (`data` = booking document):
 }
 ```
 
-### PATCH /api/bookings/:id
+### PATCH /api/bookings/:id (removed)
 
-Auth: Protected
+This single "action" endpoint no longer exists. Use these instead:
 
-Request body:
-
-- Required:
-  - `action`: `cancel` | `complete` | `mark_paid` | `mark_no_show`
-- Optional:
-  - `reason`: string, max 300
-
-Success `200` (`data` = updated booking):
-
-```json
-{
-  "status": "success",
-  "data": {
-    "_id": "666666666666666666666666",
-    "status": "cancelled",
-    "cancellationReason": "Running late"
-  }
-}
-```
+- Customer cancels: `PATCH /api/bookings/:id/cancel`
+- Customer reschedules: `PATCH /api/bookings/:id/reschedule`
+- Owner changes status (complete, no-show, and so on):
+  `PATCH /api/dashboard/:shopId/bookings/:id/status`
+- Owner cancels: `PATCH /api/dashboard/:shopId/bookings/:id/cancel`
 
 ---
 
@@ -754,14 +743,14 @@ Important routing note:
 
 - Router mount + route definitions currently produce duplicated shopId in path.
 - Effective paths are:
-  - `/api/dashboard/:shopId/:shopId/...`
+  - `/api/dashboard/:shopId/...`
 
 All dashboard endpoints require:
 
 - valid bearer token
 - authenticated user owns the `shopId` business
 
-### GET /api/dashboard/:shopId/:shopId/dashboard
+### GET /api/dashboard/:shopId/dashboard
 
 Request body: none
 
@@ -781,7 +770,7 @@ Success `200` (`data` = summary):
 }
 ```
 
-### GET /api/dashboard/:shopId/:shopId/bookings
+### GET /api/dashboard/:shopId/bookings
 
 Query params:
 
@@ -806,7 +795,7 @@ Success `200` (`data` = paginated result):
 }
 ```
 
-### PATCH /api/dashboard/:shopId/:shopId/bookings/:id/cancel
+### PATCH /api/dashboard/:shopId/bookings/:id/cancel
 
 Request body:
 
@@ -825,7 +814,7 @@ Success `200` (`data` = booking):
 }
 ```
 
-### PATCH /api/dashboard/:shopId/:shopId/bookings/:id/status
+### PATCH /api/dashboard/:shopId/bookings/:id/status
 
 Request body:
 
@@ -847,7 +836,7 @@ Success `200` (`data` = booking):
 }
 ```
 
-### POST /api/dashboard/:shopId/:shopId/staff
+### POST /api/dashboard/:shopId/staff
 
 Request body:
 
@@ -878,7 +867,7 @@ Success `201` (`data` = staff profile):
 }
 ```
 
-### PATCH /api/dashboard/:shopId/:shopId/staff/:id
+### PATCH /api/dashboard/:shopId/staff/:id
 
 Request body:
 
@@ -889,7 +878,7 @@ Request body:
 
 Success `200` (`data` = updated staff profile)
 
-### POST /api/dashboard/:shopId/:shopId/staff/:id/availability
+### POST /api/dashboard/:shopId/staff/:id/availability
 
 Request body:
 
@@ -913,7 +902,7 @@ Success `201` (`data` = availability):
 }
 ```
 
-### GET /api/dashboard/:shopId/:shopId/staff/:id/availability
+### GET /api/dashboard/:shopId/staff/:id/availability
 
 Request body: none
 
@@ -932,7 +921,7 @@ Success `200` (`data` = availability[]):
 }
 ```
 
-### POST /api/dashboard/:shopId/:shopId/staff/:id/absences
+### POST /api/dashboard/:shopId/staff/:id/absences
 
 Request body:
 
@@ -958,7 +947,7 @@ Success `201` (`data` = absence):
 }
 ```
 
-### GET /api/dashboard/:shopId/:shopId/staff/:id/absences
+### GET /api/dashboard/:shopId/staff/:id/absences
 
 Query params:
 
@@ -975,13 +964,13 @@ Success `200` (`data` = absence[]):
 }
 ```
 
-### DELETE /api/dashboard/:shopId/:shopId/staff/:id/absences/:absenceId
+### DELETE /api/dashboard/:shopId/staff/:id/absences/:absenceId
 
 Request body: none
 
 Success `204`: no response body
 
-### POST /api/dashboard/:shopId/:shopId/services
+### POST /api/dashboard/:shopId/services
 
 Request body:
 
@@ -1008,7 +997,7 @@ Success `201` (`data` = service):
 }
 ```
 
-### PATCH /api/dashboard/:shopId/:shopId/services/:id
+### PATCH /api/dashboard/:shopId/services/:id
 
 Request body:
 
@@ -1019,13 +1008,13 @@ Request body:
 
 Success `200` (`data` = updated service)
 
-### DELETE /api/dashboard/:shopId/:shopId/services/:id
+### DELETE /api/dashboard/:shopId/services/:id
 
 Request body: none
 
 Success `204`: no response body
 
-### GET /api/dashboard/:shopId/:shopId/customers
+### GET /api/dashboard/:shopId/customers
 
 Request body: none
 
@@ -1048,7 +1037,7 @@ Success `200` (`data` = customer aggregates):
 }
 ```
 
-### GET /api/dashboard/:shopId/:shopId/revenue
+### GET /api/dashboard/:shopId/revenue
 
 Query params:
 
